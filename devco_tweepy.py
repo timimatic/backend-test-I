@@ -13,16 +13,19 @@ access_token_secret = "1bIewSjjiHQnU6dJDmAVH5jmNbzrUEaAL8TfNrPlB1h67"
 consumer_key = "xDAwEvTTD9PyEyuiOQEGiVhsi"
 consumer_secret = "7SuT2lrxWxg1KgWjwweNU1CMAdTkCmC8xaF4X4z4tGCbmI4DUa"
 
+#Google Sheet Credentials
 scope = ['https://spreadsheets.google.com/feeds']
 creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 client = gspread.authorize(creds)
 
+#Open Sheet
 sheet = client.open("data store").sheet1
+
 #Listener with Filter
 class StdOutListener(StreamListener):
 
 	def on_data(self, data):
-		#Load JSON
+		#Load JSON and retrieve some variables
 		try:
 			all_data	=	json.loads(data)
 			username = str(all_data["user"]["screen_name"])
@@ -35,7 +38,7 @@ class StdOutListener(StreamListener):
 			sheet.append_row(row)
 		except:
 			print("Could not insert into GSheets!")
-		#String Concatenation
+		#String Concatenation for console display (Can be improved for special characters like Japanese and Chinese letters)
 		try:
 			twit_username = "Username: " + str(username)
 			twit_bio = "Description: " + str(desc)
@@ -50,18 +53,16 @@ class StdOutListener(StreamListener):
 			print(twit_follow)
 			print("---------------------------------------------------")
 		except:
-			print("Could not print to screen.")
+			print("Could not print to screen 1.")
 		return True
 
 	def on_error(self, status):
 		try:
 			print(status)
 		except:
-			print("Could not print to screen.")
+			print("Could not print to screen 2.")
 		
 if __name__ == '__main__': 
-	#print("Please provide the hashtag(s) below: ")
-	
 	try:
 		hashtag_input = input("Please provide the hashtags separated with a comma and no spaces: ").split(",")
 		print(hashtag_input)
@@ -72,7 +73,6 @@ if __name__ == '__main__':
 		print("App Could not authenticate")
 	try:
 		stream = Stream(auth, l)
-		#stream.filter(track=['python', 'java'])
 		stream.filter(track=hashtag_input)
 	except:
 		print("Stream Aborted!")
